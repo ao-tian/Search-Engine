@@ -63,7 +63,7 @@ version_manager = IndexVersionManager()
 
 def rebuild_index():
     """Rebuild the search index from current documents using ETL pipeline."""
-    global index, positional_index, documents, documents_words, vector_compare, pipeline
+    global index, positional_index, documents, documents_words
     
     if not documents:
         return
@@ -141,7 +141,7 @@ def rebuild_index():
 
 def initialize_engine(documents_dir: str = None, force_rebuild: bool = False):
     """Initialize or load the search engine."""
-    global index, positional_index, documents, documents_words, vector_compare
+    global index, positional_index, documents, documents_words
     
     # Ensure directories exist
     os.makedirs(DOCUMENTS_DIR, exist_ok=True)
@@ -497,7 +497,7 @@ def list_documents():
 @app.route('/api/add-document', methods=['POST'])
 def api_add_document():
     """Add a new document via API."""
-    global documents, index, documents_words
+    global documents
     
     data = request.json
     title = data.get('title', 'Untitled Document')
@@ -534,7 +534,7 @@ def api_add_document():
 @app.route('/api/upload', methods=['POST'])
 def api_upload_file():
     """Upload a file and add it as a document."""
-    global documents, index, documents_words
+    global documents
     
     if 'file' not in request.files:
         return jsonify({'error': 'No file provided'}), 400
@@ -644,7 +644,7 @@ def api_upload_file():
 @app.route('/api/delete-document/<int:doc_id>', methods=['DELETE'])
 def api_delete_document(doc_id):
     """Delete a document."""
-    global documents, index, documents_words
+    global documents
     
     if documents is None or doc_id not in documents:
         return jsonify({'error': 'Document not found'}), 404
@@ -669,7 +669,7 @@ def api_delete_document(doc_id):
 @app.route('/api/search', methods=['GET', 'POST'])
 def api_search():
     """API endpoint for search with advanced indexing and caching."""
-    global positional_index, documents, query_cache, metrics_collector
+    global positional_index, documents, documents_words, query_cache, metrics_collector
     
     if (positional_index is None and index is None) or documents is None:
         return jsonify({'error': 'Search engine not initialized'}), 500
@@ -763,7 +763,7 @@ def api_search():
         else:
             # Fallback to legacy search
             if documents_words is None:
-                from vector_search import get_words
+                from search_engine.core.vector_search import get_words
                 documents_words = []
                 for doc_id in sorted(documents.keys()):
                     doc_data = documents[doc_id]
@@ -951,7 +951,7 @@ def api_export_metrics():
 @app.route('/api/rebuild-index', methods=['POST'])
 def api_rebuild_index():
     """Force rebuild the search index."""
-    global index, documents, documents_words
+    global documents
     
     try:
         initialize_engine(force_rebuild=True)
