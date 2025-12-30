@@ -29,6 +29,7 @@ jobs:
     
     - name: Run tests
       run: |
+        export PYTHONPATH="${PYTHONPATH}:${GITHUB_WORKSPACE}/src"
         pytest tests/ -v --cov=. --cov-report=term-missing
     
     - name: Check code style

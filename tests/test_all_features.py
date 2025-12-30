@@ -2,7 +2,10 @@
 Test script for all new features.
 """
 
-from vector_search import (
+import sys
+from pathlib import Path
+sys.path.insert(0, str(Path(__file__).parent.parent / 'src'))
+from search_engine.core.vector_search import (
     VectorCompare, build_index, search_with_highlighting,
     load_documents_from_directory, save_index, load_index,
     tokenize, get_words, highlight_query_terms

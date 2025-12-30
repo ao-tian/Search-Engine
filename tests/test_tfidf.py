@@ -2,7 +2,10 @@
 Test script to demonstrate TF-IDF functionality and compare with baseline search.
 """
 
-from vector_search import (
+import sys
+from pathlib import Path
+sys.path.insert(0, str(Path(__file__).parent.parent / 'src'))
+from search_engine.core.vector_search import (
     VectorCompare, build_index, search, 
     tf, idf, tfidf, get_words
 )

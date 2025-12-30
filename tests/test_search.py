@@ -2,7 +2,10 @@
 Quick test script to verify the search engine works correctly.
 """
 
-from vector_search import VectorCompare, build_index, search
+import sys
+from pathlib import Path
+sys.path.insert(0, str(Path(__file__).parent.parent / 'src'))
+from search_engine.core.vector_search import VectorCompare, build_index, search
 
 # Sample documents
 documents = {
