@@ -1,0 +1,140 @@
+{% extends "base.html" %}
+
+{% block title %}Documents - Search Engine{% endblock %}
+
+{% block extra_styles %}
+<style>
+    .stats-bar {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 15px 20px;
+        background: #f8f9fa;
+        border-radius: 8px;
+        margin-bottom: 25px;
+    }
+    
+    .stat-item {
+        color: #666;
+        font-size: 0.9em;
+    }
+    
+    .stat-item strong {
+        color: #667eea;
+        font-size: 1.1em;
+    }
+    
+    .documents-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+        gap: 20px;
+    }
+    
+    .document-card {
+        background: white;
+        border-radius: 12px;
+        padding: 25px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        transition: transform 0.2s, box-shadow 0.2s;
+        display: flex;
+        flex-direction: column;
+        height: 100%;
+    }
+    
+    .document-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 8px 24px rgba(0,0,0,0.15);
+    }
+    
+    .document-card-title {
+        font-size: 1.2em;
+        color: #667eea;
+        margin-bottom: 12px;
+        font-weight: 600;
+    }
+    
+    .document-card-title a {
+        color: #667eea;
+        text-decoration: none;
+    }
+    
+    .document-card-title a:hover {
+        text-decoration: underline;
+    }
+    
+    .document-card-preview {
+        color: #666;
+        font-size: 0.9em;
+        line-height: 1.5;
+        margin-bottom: 15px;
+        display: -webkit-box;
+        -webkit-line-clamp: 3;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+        flex-grow: 1;
+    }
+    
+    .document-card-meta {
+        display: flex;
+        justify-content: space-between;
+        font-size: 0.85em;
+        color: #999;
+        padding-top: 15px;
+        border-top: 1px solid #e0e0e0;
+        margin-bottom: 15px;
+    }
+    
+    .document-card-actions {
+        margin-top: auto;
+        padding-top: 10px;
+    }
+    
+    .btn-small {
+        padding: 8px 16px;
+        font-size: 0.9em;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1>All Documents</h1>
+    <div class="page-subtitle">Browse all indexed documents</div>
+</div>
+
+<div class="card">
+    <div class="stats-bar">
+        <div class="stat-item">
+            Total Documents: <strong>{{ doc_count }}</strong>
+        </div>
+    </div>
+    
+    {% if documents %}
+    <div class="documents-grid">
+        {% for doc in documents %}
+        <div class="document-card">
+            <div class="document-card-title">
+                <a href="/doc/{{ doc.id }}">{{ doc.title }}</a>
+            </div>
+            <div class="document-card-preview">
+                {{ doc.text_preview }}
+            </div>
+            <div class="document-card-meta">
+                <span>{{ doc.word_count }} words</span>
+                <span>{{ doc.char_count }} chars</span>
+            </div>
+            <div class="document-card-actions">
+                <a href="/doc/{{ doc.id }}" class="btn btn-primary btn-small">View</a>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div style="text-align: center; padding: 60px 20px; color: #999;">
+        <h3>No documents yet</h3>
+        <p>Add documents using the Manage page</p>
+        <a href="/manage" class="btn btn-primary" style="margin-top: 20px;">Add Documents</a>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

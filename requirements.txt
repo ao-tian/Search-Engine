@@ -1,0 +1,16 @@
+# Web framework
+Flask>=2.3.0
+
+# Document parsing
+PyPDF2>=3.0.0
+python-docx>=1.0.0
+openpyxl>=3.1.0  # For .docx files
+
+# Rich content rendering
+markdown>=3.4.0
+bleach>=6.0.0  # HTML sanitization
+
+# Testing
+pytest>=7.4.0
+pytest-cov>=4.1.0
+

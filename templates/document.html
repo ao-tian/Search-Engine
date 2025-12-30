@@ -1,0 +1,172 @@
+{% extends "base.html" %}
+
+{% block title %}{{ title }} - Search Engine{% endblock %}
+
+{% block container_width %}900px{% endblock %}
+
+{% block extra_styles %}
+<style>
+    .document {
+        background: white;
+        border-radius: 12px;
+        padding: 40px;
+        box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+    }
+    
+    .document-content {
+        line-height: 1.8;
+        color: #333;
+        font-size: 1.1em;
+    }
+    
+    .document-content h1,
+    .document-content h2,
+    .document-content h3,
+    .document-content h4 {
+        color: #667eea;
+        margin-top: 30px;
+        margin-bottom: 15px;
+    }
+    
+    .document-content h1 {
+        font-size: 2em;
+        border-bottom: 2px solid #e0e0e0;
+        padding-bottom: 10px;
+    }
+    
+    .document-content h2 {
+        font-size: 1.5em;
+    }
+    
+    .document-content h3 {
+        font-size: 1.3em;
+    }
+    
+    .document-content p {
+        margin-bottom: 15px;
+    }
+    
+    .document-content img {
+        max-width: 100%;
+        height: auto;
+        border-radius: 8px;
+        margin: 20px 0;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        display: block;
+    }
+    
+    .document-content img[src=""],
+    .document-content img:not([src]) {
+        display: none;
+    }
+    
+    .document-content a {
+        color: #667eea;
+        text-decoration: none;
+        border-bottom: 1px solid transparent;
+        transition: border-color 0.3s;
+    }
+    
+    .document-content a:hover {
+        border-bottom-color: #667eea;
+    }
+    
+    .document-content code {
+        background: #f5f5f5;
+        padding: 2px 6px;
+        border-radius: 4px;
+        font-family: 'Monaco', 'Courier New', monospace;
+        font-size: 0.9em;
+    }
+    
+    .document-content pre {
+        background: #f5f5f5;
+        padding: 15px;
+        border-radius: 8px;
+        overflow-x: auto;
+        margin: 20px 0;
+    }
+    
+    .document-content pre code {
+        background: none;
+        padding: 0;
+    }
+    
+    .document-content ul,
+    .document-content ol {
+        margin: 15px 0;
+        padding-left: 30px;
+    }
+    
+    .document-content li {
+        margin: 8px 0;
+    }
+    
+    .document-content blockquote {
+        border-left: 4px solid #667eea;
+        padding-left: 20px;
+        margin: 20px 0;
+        color: #666;
+        font-style: italic;
+    }
+    
+    .document-content table {
+        width: 100%;
+        border-collapse: collapse;
+        margin: 20px 0;
+    }
+    
+    .document-content table th,
+    .document-content table td {
+        padding: 12px;
+        border: 1px solid #e0e0e0;
+        text-align: left;
+    }
+    
+    .document-content table th {
+        background: #f8f9fa;
+        font-weight: 600;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1>{{ title }}</h1>
+    <div class="page-subtitle">
+        Document ID: {{ doc_id }}
+        {% if path %}
+        | Path: {{ path }}
+        {% endif %}
+    </div>
+</div>
+
+<div class="document">
+    <div class="document-content">
+        {% if rendered_content %}
+            {{ rendered_content|safe }}
+        {% else %}
+            {{ text|nl2br }}
+        {% endif %}
+    </div>
+</div>
+
+<script>
+// Add error handling for broken images
+document.addEventListener('DOMContentLoaded', function() {
+    const images = document.querySelectorAll('.document-content img');
+    images.forEach(function(img) {
+        img.addEventListener('error', function() {
+            console.error('Failed to load image:', this.src);
+            // Optionally show a placeholder or error message
+            this.style.display = 'none';
+            const errorMsg = document.createElement('p');
+            errorMsg.style.color = '#999';
+            errorMsg.style.fontStyle = 'italic';
+            errorMsg.textContent = 'Image could not be loaded. The image server may block hotlinking.';
+            this.parentNode.insertBefore(errorMsg, this);
+        });
+    });
+});
+</script>
+{% endblock %}

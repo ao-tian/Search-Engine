@@ -1,0 +1,311 @@
+{% extends "base.html" %}
+
+{% block title %}Search - Search Engine{% endblock %}
+
+{% block container_width %}900px{% endblock %}
+
+{% block extra_styles %}
+<style>
+    .search-box {
+        background: white;
+        border-radius: 12px;
+        padding: 30px;
+        box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+        margin-bottom: 30px;
+    }
+    
+    .search-form {
+        display: flex;
+        gap: 10px;
+    }
+    
+    .search-input {
+        flex: 1;
+        padding: 15px 20px;
+        font-size: 16px;
+        border: 2px solid #e0e0e0;
+        border-radius: 8px;
+        outline: none;
+        transition: border-color 0.3s;
+    }
+    
+    .search-input:focus {
+        border-color: #667eea;
+    }
+    
+    .search-button {
+        padding: 15px 30px;
+        font-size: 16px;
+        background: #667eea;
+        color: white;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: background 0.3s;
+        font-weight: 600;
+    }
+    
+    .search-button:hover {
+        background: #5568d3;
+    }
+    
+    .stats {
+        text-align: center;
+        margin-bottom: 30px;
+    }
+    
+    .stats-container {
+        background: rgba(255, 255, 255, 0.15);
+        backdrop-filter: blur(10px);
+        border-radius: 12px;
+        padding: 20px 30px;
+        display: inline-block;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    }
+    
+    .stats-tagline {
+        color: white;
+        font-size: 1.1em;
+        font-weight: 500;
+        margin-bottom: 8px;
+        text-shadow: 1px 1px 2px rgba(0,0,0,0.2);
+    }
+    
+    .stats-count {
+        color: white;
+        font-size: 0.95em;
+        opacity: 0.95;
+        text-shadow: 1px 1px 2px rgba(0,0,0,0.2);
+    }
+    
+    .stats-count strong {
+        font-weight: 700;
+        font-size: 1.1em;
+        color: #ffeb3b;
+        text-shadow: 1px 1px 3px rgba(0,0,0,0.3);
+    }
+    
+    .results {
+        background: white;
+        border-radius: 12px;
+        padding: 30px;
+        box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+        min-height: 200px;
+    }
+    
+    .result-item {
+        padding: 20px;
+        border-bottom: 1px solid #e0e0e0;
+        transition: background 0.2s;
+    }
+    
+    .result-item:hover {
+        background: #f5f5f5;
+    }
+    
+    .result-item:last-child {
+        border-bottom: none;
+    }
+    
+    .result-title {
+        font-size: 1.3em;
+        color: #667eea;
+        margin-bottom: 10px;
+        font-weight: 600;
+    }
+    
+    .result-title a {
+        color: #667eea;
+        text-decoration: none;
+    }
+    
+    .result-title a:hover {
+        text-decoration: underline;
+    }
+    
+    .result-text {
+        color: #666;
+        line-height: 1.6;
+        margin-bottom: 10px;
+    }
+    
+    .result-text mark {
+        background: #ffeb3b;
+        padding: 2px 4px;
+        border-radius: 3px;
+        font-weight: 600;
+    }
+    
+    .result-meta {
+        font-size: 0.85em;
+        color: #999;
+        display: flex;
+        gap: 15px;
+    }
+    
+    .result-score {
+        color: #667eea;
+        font-weight: 600;
+    }
+    
+    .no-results {
+        text-align: center;
+        padding: 60px 20px;
+        color: #999;
+    }
+    
+    .no-results h3 {
+        font-size: 1.5em;
+        margin-bottom: 10px;
+    }
+    
+    .loading {
+        text-align: center;
+        padding: 40px;
+        color: #667eea;
+    }
+    
+    .spinner {
+        border: 3px solid #f3f3f3;
+        border-top: 3px solid #667eea;
+        border-radius: 50%;
+        width: 40px;
+        height: 40px;
+        animation: spin 1s linear infinite;
+        margin: 0 auto 20px;
+    }
+    
+    @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1>Search Engine</h1>
+</div>
+
+<div class="stats">
+    <div class="stats-container">
+        <div class="stats-tagline">TF-IDF Powered Vector Space Search</div>
+        <div class="stats-count" id="stats">Loading...</div>
+    </div>
+</div>
+
+<div class="search-box">
+    <form class="search-form" id="searchForm" onsubmit="performSearch(event)">
+        <input 
+            type="text" 
+            class="search-input" 
+            id="searchInput" 
+            placeholder="Enter your search query... (use quotes for phrases: &quot;exact phrase&quot;)"
+            autocomplete="off"
+        >
+        <button type="submit" class="search-button">Search</button>
+    </form>
+</div>
+
+<div class="results" id="results">
+    <div class="no-results">
+        <h3>Ready to search</h3>
+        <p>Enter a query above to find relevant documents</p>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+    // Load stats on page load
+    fetch('/api/stats')
+        .then(res => res.json())
+        .then(data => {
+            document.getElementById('stats').innerHTML = 
+                `Indexed <strong>${data.document_count}</strong> documents`;
+        });
+    
+    function performSearch(event) {
+        event.preventDefault();
+        const query = document.getElementById('searchInput').value.trim();
+        
+        if (!query) {
+            return;
+        }
+        
+        // Show loading
+        document.getElementById('results').innerHTML = `
+            <div class="loading">
+                <div class="spinner"></div>
+                <p>Searching...</p>
+            </div>
+        `;
+        
+        // Perform search
+        fetch(`/api/search?q=${encodeURIComponent(query)}`)
+            .then(res => res.json())
+            .then(data => {
+                displayResults(data);
+            })
+            .catch(err => {
+                document.getElementById('results').innerHTML = `
+                    <div class="no-results">
+                        <h3>Error</h3>
+                        <p>${err.message}</p>
+                    </div>
+                `;
+            });
+    }
+    
+    function displayResults(data) {
+        const resultsDiv = document.getElementById('results');
+        
+        if (data.error) {
+            resultsDiv.innerHTML = `
+                <div class="no-results">
+                    <h3>Error</h3>
+                    <p>${data.error}</p>
+                </div>
+            `;
+            return;
+        }
+        
+        if (data.count === 0) {
+            resultsDiv.innerHTML = `
+                <div class="no-results">
+                    <h3>No results found</h3>
+                    <p>Try different search terms</p>
+                </div>
+            `;
+            return;
+        }
+        
+        let html = '';
+        data.results.forEach((result, index) => {
+            html += `
+                <div class="result-item">
+                    <div class="result-title">
+                        <a href="${result.url}">${result.title}</a>
+                    </div>
+                    <div class="result-text">
+                        ${result.highlighted_text ? result.highlighted_text : (result.text || '')}
+                    </div>
+                    <div class="result-meta">
+                        <span class="result-score">Relevance: ${(result.score * 100).toFixed(2)}%</span>
+                        <span>Document ID: ${result.doc_id}</span>
+                    </div>
+                </div>
+            `;
+        });
+        
+        resultsDiv.innerHTML = html;
+    }
+    
+    // Allow Enter key to search
+    document.getElementById('searchInput').addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') {
+            performSearch(e);
+        }
+    });
+</script>
+{% endblock %}

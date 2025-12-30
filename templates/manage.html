@@ -1,0 +1,458 @@
+{% extends "base.html" %}
+
+{% block title %}Manage Documents - Search Engine{% endblock %}
+
+{% block container_width %}1000px{% endblock %}
+
+{% block extra_styles %}
+<style>
+    .section-title {
+        font-size: 1.5em;
+        color: #667eea;
+        margin-bottom: 20px;
+        border-bottom: 2px solid #e0e0e0;
+        padding-bottom: 10px;
+    }
+    
+    .form-group {
+        margin-bottom: 20px;
+    }
+    
+    label {
+        display: block;
+        margin-bottom: 8px;
+        color: #333;
+        font-weight: 600;
+    }
+    
+    input[type="text"], textarea {
+        width: 100%;
+        padding: 12px;
+        border: 2px solid #e0e0e0;
+        border-radius: 6px;
+        font-size: 14px;
+        font-family: inherit;
+    }
+    
+    textarea {
+        min-height: 150px;
+        resize: vertical;
+    }
+    
+    input:focus, textarea:focus {
+        outline: none;
+        border-color: #667eea;
+    }
+    
+    .file-upload {
+        border: 2px dashed #e0e0e0;
+        border-radius: 6px;
+        padding: 30px;
+        text-align: center;
+        cursor: pointer;
+        transition: border-color 0.3s;
+    }
+    
+    .file-upload:hover {
+        border-color: #667eea;
+    }
+    
+    .file-upload input[type="file"] {
+        display: none;
+    }
+    
+    .documents-list {
+        margin-top: 20px;
+    }
+    
+    .document-item {
+        padding: 15px;
+        border: 1px solid #e0e0e0;
+        border-radius: 6px;
+        margin-bottom: 10px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+    
+    .document-info {
+        flex: 1;
+    }
+    
+    .document-title {
+        font-weight: 600;
+        color: #667eea;
+        margin-bottom: 5px;
+    }
+    
+    .document-preview {
+        color: #666;
+        font-size: 0.9em;
+    }
+    
+    .document-path {
+        color: #999;
+        font-size: 0.85em;
+        margin-top: 5px;
+    }
+    
+    .message {
+        padding: 12px;
+        border-radius: 6px;
+        margin-bottom: 20px;
+        display: none;
+    }
+    
+    .message-success {
+        background: #d4edda;
+        color: #155724;
+        border: 1px solid #c3e6cb;
+    }
+    
+    .message-error {
+        background: #f8d7da;
+        color: #721c24;
+        border: 1px solid #f5c6cb;
+    }
+    
+    .btn-small {
+        padding: 6px 12px;
+        font-size: 0.85em;
+    }
+    
+    .action-buttons {
+        display: flex;
+        gap: 15px;
+        margin-bottom: 30px;
+        justify-content: center;
+    }
+    
+    .action-btn {
+        padding: 15px 30px;
+        font-size: 1.1em;
+        min-width: 200px;
+    }
+    
+    /* Modal Styles */
+    .modal-overlay {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.5);
+        backdrop-filter: blur(5px);
+        z-index: 1000;
+        align-items: center;
+        justify-content: center;
+    }
+    
+    .modal-overlay.active {
+        display: flex;
+    }
+    
+    .modal {
+        background: white;
+        border-radius: 12px;
+        padding: 30px;
+        box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        max-width: 600px;
+        width: 90%;
+        max-height: 90vh;
+        overflow-y: auto;
+        position: relative;
+        animation: modalSlideIn 0.3s ease-out;
+    }
+    
+    @keyframes modalSlideIn {
+        from {
+            opacity: 0;
+            transform: translateY(-50px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+    
+    .modal-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 25px;
+        padding-bottom: 15px;
+        border-bottom: 2px solid #e0e0e0;
+    }
+    
+    .modal-title {
+        font-size: 1.5em;
+        color: #667eea;
+        font-weight: 600;
+        margin: 0;
+    }
+    
+    .modal-close {
+        background: none;
+        border: none;
+        font-size: 1.5em;
+        color: #999;
+        cursor: pointer;
+        padding: 0;
+        width: 30px;
+        height: 30px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 50%;
+        transition: all 0.3s;
+    }
+    
+    .modal-close:hover {
+        background: #f0f0f0;
+        color: #333;
+    }
+    
+    .modal-body {
+        margin-bottom: 25px;
+    }
+    
+    .modal-footer {
+        display: flex;
+        gap: 10px;
+        justify-content: flex-end;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1>Document Management</h1>
+    <div class="page-subtitle">Add, view, and manage your searchable documents</div>
+</div>
+
+<div id="message" class="message"></div>
+
+<!-- Action Buttons -->
+<div class="action-buttons">
+    <button class="btn btn-primary action-btn" onclick="openAddDocumentModal()">Add New Document</button>
+    <button class="btn btn-primary action-btn" onclick="openUploadModal()">Upload File</button>
+</div>
+
+<!-- Add Document Modal -->
+<div id="addDocumentModal" class="modal-overlay" onclick="closeModalOnOverlay(event, 'addDocumentModal')">
+    <div class="modal" onclick="event.stopPropagation()">
+        <div class="modal-header">
+            <h2 class="modal-title">Add New Document</h2>
+            <button class="modal-close" onclick="closeModal('addDocumentModal')">&times;</button>
+        </div>
+        <div class="modal-body">
+            <form id="addDocumentForm">
+                <div class="form-group">
+                    <label for="docTitle">Title</label>
+                    <input type="text" id="docTitle" name="title" placeholder="Enter document title" required>
+                </div>
+                
+                    <div class="form-group">
+                        <label for="docText">Content</label>
+                        <textarea id="docText" name="text" placeholder="Paste or type document content here...&#10;&#10;You can use Markdown syntax:&#10;- Headers: # Title, ## Subtitle&#10;- Images: ![alt text](https://example.com/image.jpg)&#10;- Links: [link text](https://example.com)&#10;- Code: `code` or ```code blocks```&#10;- Lists: * item or 1. item" required></textarea>
+                        <small style="color: #666; font-size: 0.9em; margin-top: 5px; display: block;">
+                            Supports Markdown: images, links, headers, code blocks, tables, and more
+                        </small>
+                    </div>
+            </form>
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" onclick="closeModal('addDocumentModal')">Cancel</button>
+            <button type="button" class="btn btn-primary" onclick="submitAddDocument()">Add Document</button>
+        </div>
+    </div>
+</div>
+
+<!-- Upload File Modal -->
+<div id="uploadModal" class="modal-overlay" onclick="closeModalOnOverlay(event, 'uploadModal')">
+    <div class="modal" onclick="event.stopPropagation()">
+        <div class="modal-header">
+            <h2 class="modal-title">Upload File</h2>
+            <button class="modal-close" onclick="closeModal('uploadModal')">&times;</button>
+        </div>
+        <div class="modal-body">
+            <div class="file-upload" onclick="document.getElementById('fileInput').click()">
+                <p>Click to select a file or drag and drop</p>
+                <p style="color: #999; font-size: 0.9em; margin-top: 10px;">Supported formats: .txt, .md, .pdf, .docx</p>
+                <input type="file" id="fileInput" accept=".txt,.md,.text,.pdf,.docx" onchange="handleFileSelect(event)">
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" onclick="closeModal('uploadModal')">Cancel</button>
+        </div>
+    </div>
+</div>
+
+<!-- Documents List -->
+<div class="card">
+    <h2 class="section-title">Documents ({{ doc_count }})</h2>
+    
+    <div class="documents-list" id="documentsList">
+        {% if documents %}
+            {% for doc in documents %}
+            <div class="document-item" id="doc-{{ doc.id }}">
+                <div class="document-info">
+                    <div class="document-title">{{ doc.title }}</div>
+                    <div class="document-preview">{{ doc.text_preview }}</div>
+                    {% if doc.path %}
+                    <div class="document-path">{{ doc.path }}</div>
+                    {% endif %}
+                    {% if doc.word_count %}
+                    <div class="document-path" style="margin-top: 5px;">{{ doc.word_count }} words</div>
+                    {% endif %}
+                </div>
+                <div>
+                    <a href="/doc/{{ doc.id }}" class="btn btn-secondary btn-small" style="margin-right: 10px;">View</a>
+                    <button onclick="deleteDocument({{ doc.id }})" class="btn btn-danger btn-small">Delete</button>
+                </div>
+            </div>
+            {% endfor %}
+        {% else %}
+            <p style="text-align: center; color: #999; padding: 40px;">No documents yet. Add one above!</p>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+    function showMessage(text, type) {
+        const messageDiv = document.getElementById('message');
+        messageDiv.className = `message message-${type}`;
+        messageDiv.textContent = text;
+        messageDiv.style.display = 'block';
+        
+        setTimeout(() => {
+            messageDiv.style.display = 'none';
+        }, 5000);
+    }
+    
+    function openAddDocumentModal() {
+        document.getElementById('addDocumentModal').classList.add('active');
+        document.body.style.overflow = 'hidden';
+    }
+    
+    function openUploadModal() {
+        document.getElementById('uploadModal').classList.add('active');
+        document.body.style.overflow = 'hidden';
+    }
+    
+    function closeModal(modalId) {
+        document.getElementById(modalId).classList.remove('active');
+        document.body.style.overflow = '';
+    }
+    
+    function closeModalOnOverlay(event, modalId) {
+        if (event.target.id === modalId) {
+            closeModal(modalId);
+        }
+    }
+    
+    // Close modal on Escape key
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') {
+            closeModal('addDocumentModal');
+            closeModal('uploadModal');
+        }
+    });
+    
+    function submitAddDocument() {
+        const title = document.getElementById('docTitle').value.trim();
+        const text = document.getElementById('docText').value.trim();
+        
+        if (!title || !text) {
+            showMessage('Please fill in both title and content', 'error');
+            return;
+        }
+        
+        fetch('/api/add-document', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ title, text })
+        })
+        .then(async response => {
+            const data = await response.json();
+            if (response.ok) {
+                showMessage(data.message, 'success');
+                document.getElementById('addDocumentForm').reset();
+                closeModal('addDocumentModal');
+                setTimeout(() => location.reload(), 1000);
+            } else {
+                showMessage(data.error, 'error');
+            }
+        })
+        .catch(error => {
+            showMessage('Error adding document: ' + error.message, 'error');
+        });
+    }
+    
+    function handleFileSelect(event) {
+        const file = event.target.files[0];
+        if (!file) return;
+        
+        showMessage('Uploading and processing file...', 'success');
+        
+        const formData = new FormData();
+        formData.append('file', file);
+        
+        fetch('/api/upload', {
+            method: 'POST',
+            body: formData
+        })
+        .then(async response => {
+            const data = await response.json();
+            if (!response.ok) {
+                throw new Error(data.error || 'Upload failed');
+            }
+            return data;
+        })
+        .then(data => {
+            if (data.success) {
+                showMessage(data.message, 'success');
+                closeModal('uploadModal');
+                setTimeout(() => location.reload(), 1500);
+            } else {
+                showMessage(data.error || 'Upload failed', 'error');
+            }
+        })
+        .catch(error => {
+            const errorMsg = error.message || 'Error uploading file';
+            showMessage(errorMsg, 'error');
+            console.error('Upload error:', error);
+        });
+        
+        event.target.value = '';
+    }
+    
+    function deleteDocument(docId) {
+        if (!confirm('Are you sure you want to delete this document?')) {
+            return;
+        }
+        
+        fetch(`/api/delete-document/${docId}`, {
+            method: 'DELETE'
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                showMessage(data.message, 'success');
+                document.getElementById(`doc-${docId}`).remove();
+                setTimeout(() => location.reload(), 1000);
+            } else {
+                showMessage(data.error, 'error');
+            }
+        })
+        .catch(error => {
+            showMessage('Error deleting document: ' + error.message, 'error');
+        });
+    }
+</script>
+{% endblock %}

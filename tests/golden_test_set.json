@@ -1,0 +1,76 @@
+{
+  "description": "Golden test set for regression testing",
+  "version": "1.0",
+  "documents": [
+    {
+      "id": 0,
+      "title": "Machine Learning Basics",
+      "text": "Machine learning is a subset of artificial intelligence. It enables systems to learn from data without explicit programming. Supervised learning uses labeled data, while unsupervised learning finds patterns in unlabeled data."
+    },
+    {
+      "id": 1,
+      "title": "Python Programming",
+      "text": "Python is a high-level programming language known for its simplicity. It supports multiple programming paradigms including object-oriented and functional programming. Python has a large standard library."
+    },
+    {
+      "id": 2,
+      "title": "Web Development",
+      "text": "Web development involves creating websites and web applications. Frontend development uses HTML, CSS, and JavaScript. Backend development handles server-side logic and databases."
+    },
+    {
+      "id": 3,
+      "title": "Data Structures",
+      "text": "Data structures organize data in computer memory. Common structures include arrays, linked lists, stacks, queues, and trees. Efficient data structures improve algorithm performance."
+    },
+    {
+      "id": 4,
+      "title": "Cloud Computing",
+      "text": "Cloud computing delivers computing services over the internet. It provides on-demand access to computing resources. Major providers include AWS, Azure, and Google Cloud Platform."
+    }
+  ],
+  "expected_results": [
+    {
+      "query": "machine learning",
+      "top_k": 3,
+      "expected_doc_ids": [0],
+      "min_score": 0.1,
+      "description": "Should find document about machine learning"
+    },
+    {
+      "query": "python programming",
+      "top_k": 3,
+      "expected_doc_ids": [1],
+      "min_score": 0.1,
+      "description": "Should find document about Python"
+    },
+    {
+      "query": "web development",
+      "top_k": 3,
+      "expected_doc_ids": [2],
+      "min_score": 0.1,
+      "description": "Should find document about web development"
+    },
+    {
+      "query": "data structures",
+      "top_k": 3,
+      "expected_doc_ids": [3],
+      "min_score": 0.1,
+      "description": "Should find document about data structures"
+    },
+    {
+      "query": "cloud computing",
+      "top_k": 3,
+      "expected_doc_ids": [4],
+      "min_score": 0.1,
+      "description": "Should find document about cloud computing"
+    },
+    {
+      "query": "programming language",
+      "top_k": 3,
+      "expected_doc_ids": [1, 2],
+      "min_score": 0.05,
+      "description": "Should find documents mentioning programming"
+    }
+  ]
+}
+
