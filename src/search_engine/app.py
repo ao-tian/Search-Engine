@@ -644,7 +644,6 @@ def api_upload_file():
 @app.route('/api/delete-document/<int:doc_id>', methods=['DELETE'])
 def api_delete_document(doc_id):
     """Delete a document."""
-    global documents
     
     if documents is None or doc_id not in documents:
         return jsonify({'error': 'Document not found'}), 404
@@ -669,7 +668,7 @@ def api_delete_document(doc_id):
 @app.route('/api/search', methods=['GET', 'POST'])
 def api_search():
     """API endpoint for search with advanced indexing and caching."""
-    global positional_index, documents, documents_words, query_cache, metrics_collector
+    global documents_words
     
     if (positional_index is None and index is None) or documents is None:
         return jsonify({'error': 'Search engine not initialized'}), 500
@@ -951,7 +950,6 @@ def api_export_metrics():
 @app.route('/api/rebuild-index', methods=['POST'])
 def api_rebuild_index():
     """Force rebuild the search index."""
-    global documents
     
     try:
         initialize_engine(force_rebuild=True)
