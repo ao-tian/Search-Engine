@@ -86,27 +86,23 @@ Documents → ETL Pipeline → Positional Index → Search Engine
 
 ## Demo
 
-<div style="display: flex; flex-direction: column; gap: 20px;">
-
 ### Search Interface
-<img src="demo/1_search.png" alt="Search Interface" style="width: 100%;">
+<img src="demo/1_search.png" alt="Search Interface" style="width: 100%; margin-bottom: 20px;">
 
 ### Document View
-<img src="demo/2_document.png" alt="Document View" style="width: 100%;">
+<img src="demo/2_document.png" alt="Document View" style="width: 100%; margin-bottom: 20px;">
 
 ### Document Management
-<img src="demo/3_manage.png" alt="Document Management" style="width: 100%;">
+<img src="demo/3_manage.png" alt="Document Management" style="width: 100%; margin-bottom: 20px;">
 
 ### Add Document
-<img src="demo/4_add_document.png" alt="Add Document" style="width: 100%;">
+<img src="demo/4_add_document.png" alt="Add Document" style="width: 100%; margin-bottom: 20px;">
 
 ### Metrics Dashboard - Overview
-<img src="demo/5_metrics1.png" alt="Metrics Dashboard - Overview" style="width: 100%;">
+<img src="demo/5_metrics1.png" alt="Metrics Dashboard - Overview" style="width: 100%; margin-bottom: 20px;">
 
 ### Metrics Dashboard - Details
 <img src="demo/6_metrics2.png" alt="Metrics Dashboard - Details" style="width: 100%;">
-
-</div>
 
 ## Setup Guide
 
